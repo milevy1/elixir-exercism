@@ -17,15 +17,16 @@ defmodule RnaTranscription do
   """
   @spec to_rna([char]) :: [char]
   def to_rna(dna) do
-    # Build case switch for complments
-    case dna do
-      'G' -> 'C'
-      'C' -> 'G'
-      'T' -> 'A'
-      'A' -> 'U'
+    Enum.map(dna, &dna_char_to_rna/1)
+  end
+
+  defp dna_char_to_rna(char) do
+    case char do
+      ?G -> ?C
+      ?C -> ?G
+      ?T -> ?A
+      ?A -> ?U
       _ -> '?'
     end
-
-    # Iterate through each char in string with complements case
   end
 end
