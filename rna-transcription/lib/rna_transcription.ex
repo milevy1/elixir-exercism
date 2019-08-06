@@ -16,17 +16,12 @@ defmodule RnaTranscription do
 
   """
   @spec to_rna([char]) :: [char]
-  def to_rna(dna) do
-    Enum.map(dna, &dna_char_to_rna/1)
+  def to_rna([_head | _tail] = dna) do
+    Enum.map(dna, &to_rna/1)
   end
 
-  defp dna_char_to_rna(char) do
-    case char do
-      ?G -> ?C
-      ?C -> ?G
-      ?T -> ?A
-      ?A -> ?U
-      _ -> '?'
-    end
-  end
+  def to_rna(?G), do: ?C
+  def to_rna(?C), do: ?G
+  def to_rna(?T), do: ?A
+  def to_rna(?A), do: ?U
 end
