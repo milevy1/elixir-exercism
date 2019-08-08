@@ -3,17 +3,24 @@ defmodule Bob do
    This is Bob. :-)
    """
 
-  @doc """
-  He answers 'Whatever.' to anything else.
+   @doc """
+   Returns "Whoa, chill out!" to all capital chars
+   Returns "Whatever." to anything else.
 
-  Returns `:ok`.
+   ## Examples
 
-  ## Examples
+   iex> Bob.hey("WATCH OUT!")
+   "Whoa, chill out!"
 
-      iex> Bob.hey("Tom-ay-to, tom-aaaah-to.")
-      "Whatever."
+   iex> Bob.hey("Tom-ay-to, tom-aaaah-to.")
+   "Whatever."
 
-  """
-  def hey(_), do: "Whatever."
+   """
+   def hey(string) do
+     cond do
+       string == String.upcase(string) -> "Whoa, chill out!"
+       true -> "Whatever."
+     end
+   end
 
 end
