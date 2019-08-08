@@ -1,7 +1,19 @@
 defmodule Bob do
-  def hey(input) do
-    cond do
-      true -> raise "Your implementation goes here"
-    end
-  end
+  @moduledoc """
+   This is Bob. :-)
+   """
+
+  @doc """
+  He answers 'Whatever.' to anything else.
+
+  Returns `:ok`.
+
+  ## Examples
+
+      iex> Bob.hey("Tom-ay-to, tom-aaaah-to.")
+      "Whatever."
+
+  """
+  def hey(_), do: "Whatever."
+
 end
