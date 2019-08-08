@@ -1,26 +1,19 @@
 defmodule Bob do
-  @moduledoc """
-   This is Bob. :-)
-   """
 
-   @doc """
-   Returns "Whoa, chill out!" to all capital chars
-   Returns "Whatever." to anything else.
-
-   ## Examples
-
-   iex> Bob.hey("WATCH OUT!")
-   "Whoa, chill out!"
-
-   iex> Bob.hey("Tom-ay-to, tom-aaaah-to.")
-   "Whatever."
-
-   """
    def hey(string) do
      cond do
-       string == String.upcase(string) -> "Whoa, chill out!"
+       is_question?(string) -> "Sure."
+       is_shouting?(string) -> "Whoa, chill out!"
        true -> "Whatever."
      end
+   end
+
+   def is_question?(string) do
+     String.ends_with?(string, "?")
+   end
+
+   def is_shouting?(string) do
+     string == String.upcase(string)
    end
 
 end
