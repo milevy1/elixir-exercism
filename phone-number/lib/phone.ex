@@ -24,6 +24,41 @@ defmodule Phone do
   """
   @spec number(String.t()) :: String.t()
   def number(raw) do
+    case {country_code?(cleaned_number(raw)),
+          digits?(cleaned_number(raw)),
+          contains_letters?(raw),
+          String.first(area_code(cleaned_number(raw))),
+          exchange_code(cleaned_number(raw))} do
+      {_, _, _, _, "0"} -> "0000000000"
+      {_, _, _, _, "1"} -> "0000000000"
+      {_, _, _, "1", _} -> "0000000000"
+      {_, _, _, "0", _} -> "0000000000"
+      {"1", 10, false, _, _} -> cleaned_number(raw)
+      {"1", 11, false, _, _} -> String.slice(cleaned_number(raw), 1..-1)
+      _ -> "0000000000"
+    end
+  end
+
+  def cleaned_number(raw) do
+    String.replace(raw, ~r/\D/, "")
+  end
+
+  def contains_letters?(raw) do
+    case Regex.run(~r/[a-zA-z]/, raw) do
+      nil -> false
+      _ -> true
+    end
+  end
+
+  def country_code?(cleaned_number) do
+    case digits?(cleaned_number) do
+      10 -> "1"
+      _ -> String.first(cleaned_number)
+    end
+  end
+
+  def digits?(number) do
+    String.length(number)
   end
 
   @doc """
@@ -47,7 +82,18 @@ defmodule Phone do
   "000"
   """
   @spec area_code(String.t()) :: String.t()
-  def area_code(raw) do
+  def area_code(cleaned_number) do
+    case digits?(cleaned_number) do
+      10 -> String.slice(cleaned_number, 0..2)
+      _ -> String.slice(cleaned_number, 1..3)
+    end
+  end
+
+  def exchange_code(cleaned_number) do
+    case digits?(cleaned_number) do
+      10 -> String.at(cleaned_number, 3)
+      _ -> String.at(cleaned_number, 4)
+    end
   end
 
   @doc """
