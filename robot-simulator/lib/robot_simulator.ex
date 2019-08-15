@@ -5,8 +5,27 @@ defmodule RobotSimulator do
   Valid directions are: `:north`, `:east`, `:south`, `:west`
   """
   @spec create(direction :: atom, position :: {integer, integer}) :: any
-  def create(direction \\ nil, position \\ nil) do
+  def create(direction \\ :north, position \\ {0, 0}) do
+    cond do
+      valid_direction?(direction) && valid_position?(position) ->
+        {direction, position}
+      !valid_direction?(direction) -> {:error, "invalid direction"}
+      !valid_position?(position)   -> {:error, "invalid position"}
+    end
   end
+
+  defp valid_direction?(direction) do
+    case direction do
+      :north  -> true
+      :east   -> true
+      :south  -> true
+      :west   -> true
+      _       -> false
+    end
+  end
+
+  defp valid_position?({x, y}) when is_integer(x) and is_integer(y), do: {x, y}
+  defp valid_position?(_), do: false
 
   @doc """
   Simulate the robot's movement given a string of instructions.
@@ -15,6 +34,43 @@ defmodule RobotSimulator do
   """
   @spec simulate(robot :: any, instructions :: String.t()) :: any
   def simulate(robot, instructions) do
+    case invalid_intructions?(instructions) do
+      true -> {:error, "invalid instruction"}
+      false -> String.graphemes(instructions)
+               |> Enum.reduce(robot, fn command, robot -> simulate_command(command, robot) end)
+    end
+  end
+
+  defp invalid_intructions?(instructions) do
+    String.match?(instructions, ~r/[^ALR]/)
+  end
+
+  defp simulate_command(command, robot) do
+    case {direction(robot), command} do
+      {:north, "L"} -> create(:west, position(robot))
+      {:north, "R"} -> create(:east, position(robot))
+      {:north, "A"} ->
+        {x, y} = position(robot)
+        create(:north, {x, y + 1})
+
+      {:east, "L"} -> create(:north, position(robot))
+      {:east, "R"} -> create(:south, position(robot))
+      {:east, "A"} ->
+        {x, y} = position(robot)
+        create(:east, {x + 1, y})
+
+      {:south, "L"} -> create(:east, position(robot))
+      {:south, "R"} -> create(:west, position(robot))
+      {:south, "A"} ->
+        {x, y} = position(robot)
+        create(:south, {x, y - 1})
+
+      {:west, "L"} -> create(:south, position(robot))
+      {:west, "R"} -> create(:north, position(robot))
+      {:west, "A"} ->
+        {x, y} = position(robot)
+        create(:west, {x - 1, y})
+    end
   end
 
   @doc """
@@ -23,13 +79,11 @@ defmodule RobotSimulator do
   Valid directions are: `:north`, `:east`, `:south`, `:west`
   """
   @spec direction(robot :: any) :: atom
-  def direction(robot) do
-  end
+  def direction({direction, _position}), do: direction
 
   @doc """
   Return the robot's position.
   """
   @spec position(robot :: any) :: {integer, integer}
-  def position(robot) do
-  end
+  def position({_direction, position}), do: position
 end
