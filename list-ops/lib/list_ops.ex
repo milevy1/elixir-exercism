@@ -22,23 +22,45 @@ defmodule ListOps do
   end
 
   @spec map(list, (any -> any)) :: list
-  def map(l, f) do
+  def map([], _f), do: []
+  def map([head | tail], f) do
+    [f.(head) | map(tail, f)]
   end
 
   @spec filter(list, (any -> as_boolean(term))) :: list
-  def filter(l, f) do
+  def filter([], _f), do: []
+  def filter([head | tail], f) do
+    cond do
+      f.(head) -> [head | filter(tail, f)]
+      true -> filter(tail, f)
+    end
   end
 
   @type acc :: any
   @spec reduce(list, acc, (any, acc -> acc)) :: acc
-  def reduce(l, acc, f) do
+  def reduce([], acc, _f), do: acc
+  def reduce([head | tail], acc, f) do
+    reduce(tail, f.(head, acc), f)
   end
 
   @spec append(list, list) :: list
-  def append(a, b) do
+  def append([], []), do: []
+  def append(list_1, []), do: list_1
+  def append([], list_2), do: list_2
+  def append([h1 | []], [h2 | t2]) do
+    [h1 | append([h2], t2)]
+  end
+  def append([h1 | t1], list_2) do
+    [h1 | append(t1, list_2)]
   end
 
   @spec concat([[any]]) :: [any]
-  def concat(ll) do
+  # Concat always takes a List of Lists
+  def concat([]), do: []
+  def concat([[] | rest_of_lists]) do
+    concat(rest_of_lists)
+  end
+  def concat([[h1 | t1] | rest_of_lists]) do
+    [h1 | concat([t1, rest_of_lists])]
   end
 end
