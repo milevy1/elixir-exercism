@@ -47,17 +47,13 @@ defmodule ListOps do
   def append([], []), do: []
   def append(list_1, []), do: list_1
   def append([], list_2), do: list_2
-  def append([h1 | []], [h2 | t2]) do
-    [h1 | append([h2], t2)]
-  end
   def append([h1 | t1], list_2) do
     [h1 | append(t1, list_2)]
   end
 
   @spec concat([[any]]) :: [any]
   def concat([]), do: []
-  def concat([list_1 | []]), do: list_1
-  def concat([list_1 | [list_2 | rest_of_lists]]) do
-    concat([append(list_1, list_2) | rest_of_lists])
+  def concat([list_1 | rest_of_lists]) do
+    append(list_1, concat(rest_of_lists))
   end
 end
