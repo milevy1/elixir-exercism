@@ -55,12 +55,9 @@ defmodule ListOps do
   end
 
   @spec concat([[any]]) :: [any]
-  # Concat always takes a List of Lists
   def concat([]), do: []
-  def concat([[] | rest_of_lists]) do
-    concat(rest_of_lists)
-  end
-  def concat([[h1 | t1] | rest_of_lists]) do
-    [h1 | concat([t1, rest_of_lists])]
+  def concat([list_1 | []]), do: list_1
+  def concat([list_1 | [list_2 | rest_of_lists]]) do
+    concat([append(list_1, list_2) | rest_of_lists])
   end
 end
