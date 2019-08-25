@@ -11,35 +11,17 @@ defmodule Markdown do
     "<h1>Header!</h1><ul><li><em>Bold Item</em></li><li><i>Italic Item</i></li></ul>"
   """
   @spec parse(String.t()) :: String.t()
+  # Refactored nested callbacks to pipe operators
   def parse(input) do
-    # patch(Enum.join(Enum.map(String.split(m, "\n"), fn t -> process(t) end)))
     String.split(input, "\n")
     |> Enum.map(fn line -> process(line) end)
     |> Enum.join
-    |> patch
+    |> add_unordered_list_tags
   end
 
-  # defp process(t) do
-  #   if String.starts_with?(t, "#") || String.starts_with?(t, "*") do
-  #     if String.starts_with?(t, "#") do
-  #       enclose_with_header_tag(parse_header_md_level(t))
-  #     else
-  #       parse_list_md_level(t)
-  #     end
-  #   else
-  #     enclose_with_paragraph_tag(String.split(t))
-  #   end
-  # end
-
-  defp process(input) when is_list(input) do
-
-  end
-
-  defp process(input) when is_binary(input) do
-    [head | tail] = String.to_char(input)
-    process([head | tail])
-  end
-
+  # Refactored .process nested if statements into multiple
+  # functions with guards checking the first char value
+  # Refactored nested callbacks to pipe operators
   defp process(<<first_char :: binary-size(1)>> <> _tail = line) when first_char == "#" do
     parse_header_md_level(line)
     |> enclose_with_header_tag
@@ -49,58 +31,74 @@ defmodule Markdown do
     parse_list_md_level(line)
   end
 
+  # Refactored nested callbacks to pipe operators
   defp process(line) do
     String.split(line)
     |> enclose_with_paragraph_tag
   end
 
+  # Added helper function .header_size
   defp parse_header_md_level(line) do
     [h | t] = String.split(line)
-    {to_string(String.length(h)), Enum.join(t, " ")}
+    {header_size(h), Enum.join(t, " ")}
   end
 
-  defp parse_list_md_level(l) do
-    t = String.split(String.trim_leading(l, "* "))
-    "<li>" <> join_words_with_tags(t) <> "</li>"
+  defp header_size(header), do: String.length(header) |> to_string
+
+  # Refactored nested callbacks to pipe operators
+  # Renamed argument "l" to "line"
+  defp parse_list_md_level(line) do
+    words = String.trim_leading(line, "* ") |> String.split
+    "<li>" <> join_words_with_tags(words) <> "</li>"
   end
 
-  defp enclose_with_header_tag({hl, htl}) do
-    "<h" <> hl <> ">" <> htl <> "</h" <> hl <> ">"
+  # Renamed argument "htl" to "words"
+  # Renamed argument "h" to "header_size"
+  defp enclose_with_header_tag({header_size, words}) do
+    "<h" <> header_size <> ">" <> words <> "</h" <> header_size <> ">"
   end
 
-  defp enclose_with_paragraph_tag(t) do
-    "<p>#{join_words_with_tags(t)}</p>"
+  # Renamed argument "t" to "line"
+  defp enclose_with_paragraph_tag(line) do
+    "<p>#{join_words_with_tags(line)}</p>"
   end
 
-  defp join_words_with_tags(t) do
-    Enum.join(Enum.map(t, fn w -> replace_md_with_tag(w) end), " ")
+  # Refactored nested callbacks to pipe operators
+  # Renamed argument "t" to "words"
+  # Renamed fn variable "w" to "word"
+  defp join_words_with_tags(words) do
+    Enum.map(words, fn word -> replace_md_with_tag(word) end)
+    |> Enum.join(" ")
   end
 
-  defp replace_md_with_tag(w) do
-    replace_suffix_md(replace_prefix_md(w))
+  # Renamed argument "w" to "word"
+  defp replace_md_with_tag(word) do
+    replace_prefix_md(word) |> replace_suffix_md
   end
 
-  defp replace_prefix_md(w) do
+  # Renamed argument "w" to "word"
+  defp replace_prefix_md(word) do
     cond do
-      w =~ ~r/^#{"__"}{1}/ -> String.replace(w, ~r/^#{"__"}{1}/, "<strong>", global: false)
-      w =~ ~r/^[#{"_"}{1}][^#{"_"}+]/ -> String.replace(w, ~r/_/, "<em>", global: false)
-      true -> w
+      word =~ ~r/^#{"__"}{1}/ -> String.replace(word, ~r/^#{"__"}{1}/, "<strong>", global: false)
+      word =~ ~r/^[#{"_"}{1}][^#{"_"}+]/ -> String.replace(word, ~r/_/, "<em>", global: false)
+      true -> word
     end
   end
 
-  defp replace_suffix_md(w) do
+  # Renamed argument "w" to "word"
+  defp replace_suffix_md(word) do
     cond do
-      w =~ ~r/#{"__"}{1}$/ -> String.replace(w, ~r/#{"__"}{1}$/, "</strong>")
-      w =~ ~r/[^#{"_"}{1}]/ -> String.replace(w, ~r/_/, "</em>")
-      true -> w
+      word =~ ~r/#{"__"}{1}$/ -> String.replace(word, ~r/#{"__"}{1}$/, "</strong>")
+      word =~ ~r/[^#{"_"}{1}]/ -> String.replace(word, ~r/_/, "</em>")
+      true -> word
     end
   end
 
-  defp patch(l) do
-    String.replace_suffix(
-      String.replace(l, "<li>", "<ul>" <> "<li>", global: false),
-      "</li>",
-      "</li>" <> "</ul>"
-    )
+  # Renamed .patch to .add_unordered_list_tags
+  # Refactored nested callbacks to pipe operators
+  # Renamed argument "l" to "line"
+  defp add_unordered_list_tags(line) do
+    String.replace(line, "<li>", "<ul>" <> "<li>", global: false)
+    |> String.replace_suffix("</li>", "</li>" <> "</ul>")
   end
 end
