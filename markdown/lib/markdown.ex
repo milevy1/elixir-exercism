@@ -14,20 +14,19 @@ defmodule Markdown do
   # Refactored nested callbacks to pipe operators
   def parse(input) do
     String.split(input, "\n")
-    |> Enum.map(fn line -> process(line) end)
-    |> Enum.join
+    |> Enum.map_join(&process/1)
     |> add_unordered_list_tags
   end
 
   # Refactored .process nested if statements into multiple
   # functions with guards checking the first char value
   # Refactored nested callbacks to pipe operators
-  defp process(<<first_char :: binary-size(1)>> <> _tail = line) when first_char == "#" do
+  defp process("#" <> _tail = line) do
     parse_header_md_level(line)
     |> enclose_with_header_tag
   end
 
-  defp process(<<first_char :: binary-size(1)>> <> _tail = line) when first_char == "*" do
+  defp process("*" <> _tail = line) do
     parse_list_md_level(line)
   end
 
@@ -67,8 +66,7 @@ defmodule Markdown do
   # Renamed argument "t" to "words"
   # Renamed fn variable "w" to "word"
   defp join_words_with_tags(words) do
-    Enum.map(words, fn word -> replace_md_with_tag(word) end)
-    |> Enum.join(" ")
+    Enum.map_join(words, " ", &replace_md_with_tag/1)
   end
 
   # Renamed argument "w" to "word"
