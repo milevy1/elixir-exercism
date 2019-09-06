@@ -6,19 +6,16 @@ defmodule BankAccountTest do
     {:ok, account: account}
   end
 
-  # @tag :pending
   test "initial balance is 0", %{account: account} do
     assert BankAccount.balance(account) == 0
   end
 
-  @tag :pending
   test "incrementing and checking balance", %{account: account} do
     assert BankAccount.balance(account) == 0
     BankAccount.update(account, 10)
     assert BankAccount.balance(account) == 10
   end
 
-  @tag :pending
   test "amount is added to balance", %{account: account} do
     assert BankAccount.balance(account) == 0
     BankAccount.update(account, 10)
@@ -26,7 +23,6 @@ defmodule BankAccountTest do
     assert BankAccount.balance(account) == 20
   end
 
-  @tag :pending
   test "closing account rejects further inquiries", %{account: account} do
     assert BankAccount.balance(account) == 0
     BankAccount.close_bank(account)
@@ -34,7 +30,6 @@ defmodule BankAccountTest do
     assert BankAccount.update(account, 10) == {:error, :account_closed}
   end
 
-  @tag :pending
   test "incrementing balance from another process then checking it from test process", %{
     account: account
   } do
