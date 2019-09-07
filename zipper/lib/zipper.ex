@@ -4,6 +4,7 @@ defmodule Zipper do
   """
   @spec from_tree(BinTree.t()) :: Zipper.t()
   def from_tree(bin_tree) do
+    bin_tree
   end
 
   @doc """
@@ -11,6 +12,10 @@ defmodule Zipper do
   """
   @spec to_tree(Zipper.t()) :: BinTree.t()
   def to_tree(zipper) do
+    case up(zipper) do
+      nil -> zipper
+      _ -> up(zipper) |> to_tree
+    end
   end
 
   @doc """
@@ -18,6 +23,7 @@ defmodule Zipper do
   """
   @spec value(Zipper.t()) :: any
   def value(zipper) do
+    zipper.value
   end
 
   @doc """
@@ -25,6 +31,10 @@ defmodule Zipper do
   """
   @spec left(Zipper.t()) :: Zipper.t() | nil
   def left(zipper) do
+    case zipper.left do
+      nil -> nil
+      _ -> Map.merge(zipper.left, %{up: zipper})
+    end
   end
 
   @doc """
@@ -32,6 +42,10 @@ defmodule Zipper do
   """
   @spec right(Zipper.t()) :: Zipper.t() | nil
   def right(zipper) do
+    case zipper.right do
+      nil -> nil
+      _ -> Map.merge(zipper.right, %{up: zipper})
+    end
   end
 
   @doc """
@@ -39,6 +53,7 @@ defmodule Zipper do
   """
   @spec up(Zipper.t()) :: Zipper.t() | nil
   def up(zipper) do
+    Map.get(zipper, :up)
   end
 
   @doc """
@@ -46,6 +61,7 @@ defmodule Zipper do
   """
   @spec set_value(Zipper.t(), any) :: Zipper.t()
   def set_value(zipper, value) do
+    Map.put(zipper, :value, value)
   end
 
   @doc """
