@@ -1,35 +1,30 @@
 defmodule RotationalCipherTest do
   use ExUnit.Case
 
-  # @tag :pending
   test "rotate a by 1" do
     plaintext = "a"
     shift = 1
     assert RotationalCipher.rotate(plaintext, shift) == "b"
   end
 
-  @tag :pending
   test "rotate a by 26, same output as input" do
     plaintext = "a"
     shift = 26
     assert RotationalCipher.rotate(plaintext, shift) == "a"
   end
 
-  @tag :pending
   test "rotate a by 0, same output as input" do
     plaintext = "a"
     shift = 0
     assert RotationalCipher.rotate(plaintext, shift) == "a"
   end
 
-  @tag :pending
   test "rotate m by 13" do
     plaintext = "m"
     shift = 13
     assert RotationalCipher.rotate(plaintext, shift) == "z"
   end
 
-  @tag :pending
   test "rotate n by 13 with wrap around alphabet" do
     plaintext = "n"
     shift = 13
